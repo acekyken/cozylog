@@ -31,7 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -72,7 +71,7 @@ class MainActivity : ComponentActivity() {
                             }
 
                             Column (modifier = Modifier.padding(all = 8.dp)){
-                                TrackableElementCard(TrackableElement(TrackableElementType.BINARY, name = "migraine", TrackableElementValue.BinaryTrackableElement(false)))
+                                TrackableCard(Trackable(TrackableType.BINARY, name = "migraine", TrackableValue.BinaryTrackable(false)))
                             }
                         }
 
@@ -83,36 +82,19 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// The habit or symptom can have various types, e.g. you can track if a symptom was present or not, or you can track how severe it was, or just take some notes on it, or pick in a 2d coordinate system (this would need some kind of reference, so far only planned for mood with emotional wheel)
-enum class TrackableElementType {
-    BINARY, LINEAR, COORDINATE, TEXT
-}
-
-// A value for the trackable element. These need to go together with the TrackableElementType.
-sealed class TrackableElementValue() {
-    class BinaryTrackableElement(val value: Boolean = false) : TrackableElementValue()
-    class NumericTrackableElement(val value: Float = 0.0f): TrackableElementValue()
-    class TextTrackableElement(val value: String = ""): TrackableElementValue()
-    //This type is for tracking a position on a 2d coordinate system (over an image, within a 2d shape). Might need to take a coordinate type, if kotlin has anything useful there
-    class CoordinateTrackableElement(val x: Float = 0.0f, val y:Float= 0.0f): TrackableElementValue()
-}
-
-// This describes a generic Trackable Element. It has a type and a value that can be displayed, and it should result in different view.
-data class TrackableElement(val type: TrackableElementType, val name: String, val value: TrackableElementValue )
-
 @Composable
-fun TrackableElementCard(element: TrackableElement) {
+fun TrackableCard(element: Trackable) {
     when (element.type) {
-        TrackableElementType.BINARY -> TrackableBinaryElementCard(element)
-        TrackableElementType.LINEAR -> TrackableLinearElementCard(element)
+        TrackableType.BINARY -> TrackableBinaryCard(element)
+        TrackableType.LINEAR -> TrackableLinearElementCard(element)
         else -> Text("Oops")
     }
 }
 
 @Composable
-fun TrackableBinaryElementCard(element: TrackableElement) {
+fun TrackableBinaryCard(element: Trackable) {
     when (element.value) {
-        is TrackableElementValue.BinaryTrackableElement -> {
+        is TrackableValue.BinaryTrackable -> {
             Row {
                 Column(modifier = Modifier.padding(4.dp)) {
                     Text(element.name, fontFamily = fredokafamily)
@@ -128,9 +110,9 @@ fun TrackableBinaryElementCard(element: TrackableElement) {
 }
 
 @Composable
-fun TrackableLinearElementCard(element: TrackableElement) {
+fun TrackableLinearElementCard(element: Trackable) {
     when (element.value) {
-        is TrackableElementValue.NumericTrackableElement -> {
+        is TrackableValue.NumericTrackable -> {
             Row {
                 Column {
                     Text(element.name, fontFamily = fredokafamily)
@@ -146,7 +128,7 @@ fun TrackableLinearElementCard(element: TrackableElement) {
 }
 
 @Composable
-fun SliderTrackable(value: TrackableElementValue.NumericTrackableElement) {
+fun SliderTrackable(value: TrackableValue.NumericTrackable) {
     var sliderPosition by remember { mutableStateOf(value.value) }
     Column {
         Slider(
@@ -158,7 +140,7 @@ fun SliderTrackable(value: TrackableElementValue.NumericTrackableElement) {
 }
 
 @Composable
-fun SwitchTrackableBinary(value: TrackableElementValue.BinaryTrackableElement) {
+fun SwitchTrackableBinary(value: TrackableValue.BinaryTrackable) {
     var checked by remember { mutableStateOf(value.value) }
     Switch(checked = checked, onCheckedChange = {checked = it})
 }
@@ -169,9 +151,9 @@ fun TrackableElementCardPreview() {
     CozyLogTheme {
         Surface {
             Column {
-                TrackableElementCard(TrackableElement(TrackableElementType.BINARY,"migraine", TrackableElementValue.BinaryTrackableElement(true)))
+                TrackableCard(Trackable(TrackableType.BINARY,"migraine", TrackableValue.BinaryTrackable(true)))
                 Spacer(modifier = Modifier.padding(8.dp))
-                TrackableElementCard(TrackableElement(TrackableElementType.LINEAR, "anxiety", value = TrackableElementValue.NumericTrackableElement(0.5f)))
+                TrackableCard(Trackable(TrackableType.LINEAR, "anxiety", value = TrackableValue.NumericTrackable(0.5f)))
             }
 
 
