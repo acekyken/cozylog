@@ -4,5 +4,5 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.acekyken.cozylog.TrackableType
 
-@Entity
+@Entity("trackables")
 data class Trackable(@PrimaryKey val id: Int, val name: String, val type: TrackableType, val color: Int, val text: String?)
